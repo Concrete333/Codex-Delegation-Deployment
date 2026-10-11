@@ -2,9 +2,9 @@
 
 Use `scripts/deployment_runner.py` when an authorized, bounded CLI worker and predefined checks would otherwise need coordinator supervision. Prefer the native subagent route when its completion wait already does the job. The runner does not choose models, retry, review meaning or accept results.
 
-This adapter supports Luna Max, Terra, Sol and Opus 5; these are adapter limits, not skill-wide restrictions. Use another supported authorized route for other configurations; do not bypass validation.
+Supply explicit model and effort settings supported by the selected CLI and account. The adapter forwards the requested model without a model allowlist. Validation and dry-run do not establish model availability.
 
-Requires Python 3.10+, Codex CLI 0.153.4+ with ChatGPT login, or the configured Opus 5 route in [claude-cli.md](claude-cli.md). Check inherited project/CLI context before setting `trusted_context`. Windows executables must be native `.exe` files; pass `--codex` or `--claude` if discovery finds a shell shim. Unsupported settings are blockers, not permission to substitute.
+Requires Python 3.10+, Codex CLI 0.153.4+ with ChatGPT login, or the configured Claude route in [claude-cli.md](claude-cli.md). Check inherited project/CLI context before setting `trusted_context`. Windows executables must be native `.exe` files; pass `--codex` or `--claude` if discovery finds a shell shim. Unsupported settings are blockers, not permission to substitute.
 
 ## Request and run
 
@@ -16,8 +16,8 @@ Example request; replace the paths, assignment, protected files and check with t
 {
   "id": "adapter-1",
   "provider": "codex",
-  "model": "gpt-5.6-luna",
-  "effort": "max",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
   "profile": "edit",
   "cwd": "C:/work/project",
   "trusted_context": true,
@@ -40,7 +40,7 @@ python C:/path/to/agent-deployment/scripts/deployment_runner.py run C:/work/requ
 
 Dry-run validates and shows arguments; it creates no state, calls no CLI and does not establish compatibility or authentication. A real run performs read-only version/auth checks, then **one worker attempt**, followed by the predefined checks if the worker reports complete. Same ID and unchanged request return the original receipt without spending again. A changed assignment needs a new ID.
 
-Use `provider: "claude"`, `model: "claude-opus-5"` and explicit effort for Opus. Its wrapper controls remain in force: subscription preflight, five-minute caching, disabled skill discovery and tool allowlists. Claude-only fields: `allow_shell` (edit only) and optional `max_budget_usd` (API-cost estimate, not subscription allowance). This runner starts fresh sessions; saved session IDs do not imply automatic resumption.
+For Opus 5.5, use `provider: "claude"`, `model: "claude-opus-5-5"` and explicit effort supported by your CLI and account. Its wrapper controls remain in force: subscription preflight, five-minute caching, disabled skill discovery and tool allowlists. Claude-only fields: `allow_shell` (edit only) and optional `max_budget_usd` (API-cost estimate, not subscription allowance). This runner starts fresh sessions; saved session IDs do not imply automatic resumption.
 
 The timeout terminates work; it is not a polling interval. Total run time also includes authentication, each check's timeout and cleanup. There is no account-wide spending cap.
 

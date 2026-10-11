@@ -25,7 +25,7 @@ class RunnerTests(unittest.TestCase):
         self.cwd = self.root / "checkout"
         self.cwd.mkdir()
         self.state = self.root / "private-state"
-        self.job = {"id": "task-1", "provider": "codex", "model": "gpt-5.6-luna", "effort": "max",
+        self.job = {"id": "task-1", "provider": "codex", "model": "gpt-6.1-sol", "effort": "medium",
                     "cwd": str(self.cwd), "prompt": "Inspect the supplied contract. Preserve $() and `quotes` and é.",
                     "profile": "edit", "trusted_context": True, "timeout_seconds": 10,
                     "artifacts": ["result.txt"], "checks": [self.check()]}
@@ -47,7 +47,7 @@ class RunnerTests(unittest.TestCase):
 
     def claude(self):
         job = copy.deepcopy(self.job)
-        job.update(provider="claude", model="claude-opus-5", effort="low")
+        job.update(provider="claude", model="claude-opus-5-5", effort="medium")
         return job
 
     def test_readonly_hash_helper_matches_host_and_rejects_traversal(self):
@@ -260,7 +260,7 @@ class RunnerTests(unittest.TestCase):
         result, _ = self.run_fake(job=self.claude())
         self.assertEqual(result["status"], "ready_for_review")
         self.assertEqual(result["estimated_cost_usd"], 0.01)
-        self.assertEqual(self.receipt()["worker"]["reported_models"], ["claude-opus-5"])
+        self.assertEqual(self.receipt()["worker"]["reported_models"], ["claude-opus-5-5"])
         self.assertEqual(runner.read_json(result["handoff_path"])["status"], "complete")
 
     def test_claude_limits_denials_and_malformed_handoffs(self):
@@ -330,21 +330,19 @@ class RunnerTests(unittest.TestCase):
         preflight.assert_not_called()
         execute.assert_not_called()
 
-    def test_disallowed_models_and_luna_efforts(self):
-        for model, effort in (("gpt-6-astra", "high"), ("gpt-5.6-luna", "high"),
-                              ("gpt-5.6-luna", "xhigh"), ("gpt-5.6-sol", "ultra")):
-            with self.subTest(model=model, effort=effort):
-                self.job.update(model=model, effort=effort)
-                with self.assertRaises(ValueError):
-                    runner.validate(self.job)
-        job = self.claude()
-        job["model"] = "claude-fable-5-1"
-        with self.assertRaises(ValueError):
-            runner.validate(job)
+    def test_current_codex_efforts_are_explicit_and_preserved(self):
+        for effort in ("low", "medium", "high", "xhigh", "max", "ultra"):
+            with self.subTest(effort=effort):
+                job = runner.validate(dict(self.job, effort=effort))
+                args = runner.build_worker("codex", job, self.state / "task")
+                self.assertEqual(args[args.index("--model") + 1], "gpt-6.1-sol")
+                self.assertIn(f'model_reasoning_effort="{effort}"', args)
 
     def test_invalid_contract_fields_rejected(self):
         changes = [{"id": "../x"}, {"provider": "unknown"}, {"timeout_seconds": True},
                    {"trusted_context": False}, {"surprise_retry": True},
+                   {"model": "--help"}, {"model": "model name"}, {"model": "model\x00name"},
+                   {"model": ""}, {"effort": ""}, {"effort": "unsupported"},
                    {"artifacts": ["../private"]}, {"artifacts": [str(self.root / "private")]},
                    {"checks": [{"id": "test", "argv": "echo unsafe", "timeout_seconds": 5}]},
                    {"checks": [self.check(), self.check()]}, {"allow_shell": True}]
@@ -359,8 +357,8 @@ class RunnerTests(unittest.TestCase):
 
     def test_codex_command_fixes_model_effort_sandbox_and_no_delegation(self):
         args = runner.build_worker("codex", self.job, self.state / "task")
-        self.assertEqual(args[args.index("--model") + 1], "gpt-5.6-luna")
-        self.assertIn('model_reasoning_effort="max"', args)
+        self.assertEqual(args[args.index("--model") + 1], "gpt-6.1-sol")
+        self.assertIn('model_reasoning_effort="medium"', args)
         self.assertIn("agents.enabled=false", args)
         self.assertIn("features.multi_agent_v2.enabled=false", args)
         self.assertNotIn(self.job["prompt"], args)
@@ -400,8 +398,8 @@ class RunnerTests(unittest.TestCase):
         args = runner.build_worker("claude", self.claude(), self.state / "task")
         self.assertIn("--json-schema", args)
         self.assertIn("--disable-slash-commands", args)
-        self.assertIn("--model=claude-opus-5", args)
-        self.assertIn("--effort=low", args)
+        self.assertIn("--model=claude-opus-5-5", args)
+        self.assertIn("--effort=medium", args)
         self.assertEqual(args[args.index("--permission-mode") + 1], "dontAsk")
 
     def test_release_requires_confirmation_and_dead_recorded_processes(self):

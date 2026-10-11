@@ -9,11 +9,11 @@ Minimize total cost to an accepted result, including coordinator context, worker
 
 ## Decide whether to delegate
 
-**Before launching an expected long-running command, including a test suite:** read [waiting.md](references/waiting.md) and establish its completion route before starting it, even when verification is only the last step of a coding task. For command-only work, load no other reference. Use native completion or the included queue helper; do not add an agent just to wait. Known-short commands stay direct, even full suites; use existing timing evidence, not a separate timing run.
+**Before launching an expected long-running command, including a test suite:** read [waiting.md](references/waiting.md) and establish its completion route before starting it, even when verification is only the last step of a coding task. For command-only work, load no other reference. Prefer a supported foreground completion wait while remaining in the turn; use the queue helper for safely detached work needing a later wake-up. Do not add an agent just to wait. Known-short commands stay direct, even full suites; use existing timing evidence, not a separate timing run. A command that fits one supported foreground tool wait needs no queued follow-up.
 
 Keep small work local. Keep tightly coupled work with one owner, which may be a worker owning the entire component; do not split its dependent steps across agents. Prefer commands and scripts for deterministic work. Before spawning, identify a bounded workload the coordinator will stop doing and how its result can be checked. Include necessary source reading, integration and likely repair in that comparison; a cheap worker alone does not establish savings. Do not solve the whole assignment merely to make it delegable.
 
-The coordinator owns consequential behavior, interfaces and acceptance. A worker can own a settled component through implementation, tests and corrections, or an independent evidence search. Large repositories, separate files and test-writing assignments are not inherently cheap or independent.
+The coordinator settles consequential requirements and interfaces, then accepts or rejects the result. This does not require writing the implementation: one worker can own an entire bounded change, including navigation, local design, shared helpers, tests and corrections. If the coordinator must still do most of that work, stay local. Large repositories, separate files and test-writing assignments are not inherently cheap or independent.
 
 When reassessing prior results, verify the target identities and provenance first. Retain decision-level evidence on disk, not just aggregates. Reuse it when inputs are unchanged and it supports the new classification; do not rebuild merely to match an expected count. Matching totals do not establish historical membership.
 
@@ -22,8 +22,8 @@ When reassessing prior results, verify the target identities and provenance firs
 ## When delegation is useful
 
 - Use available, authorized models and efforts suited to the assignment and its checks. Follow explicit user preferences; compare total cost through acceptance. Keep the coordinator's model and effort unless asked to change them.
-- Read [delegation.md](references/delegation.md) for ownership, verification and waiting. Consult [model-selection.md](references/model-selection.md) only when model choice is unresolved and recommendations would help; skip it for an explicit choice. Reuse guidance already read.
-- For the bundled Claude wrapper, read [claude-cli.md](references/claude-cli.md); it supports Opus 5 only. Other models need a supported authorized route. Do not silently substitute or bypass adapter checks.
+- Read [delegation.md](references/delegation.md) for ownership, verification and native waiting; do not load the command-waiting guide when native completion suffices. Consult [model-selection.md](references/model-selection.md) only when model choice is unresolved and recommendations would help; skip it for an explicit choice. Reuse guidance already read.
+- For the bundled Claude wrapper, read [claude-cli.md](references/claude-cli.md) and verify the explicit model and effort against the installed CLI and account. Do not silently substitute or bypass adapter checks.
 - For a software-managed CLI attempt with predefined checks, read [software-runner.md](references/software-runner.md). Prefer native delegation when its completion wait already suffices.
 
 Workers receive their assignment and applicable project evidence, not this skill's routing policies or benchmark material.

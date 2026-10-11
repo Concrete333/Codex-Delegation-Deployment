@@ -101,18 +101,25 @@ Earlier work: [Towards a Science of Scaling Agent Systems](https://arxiv.org/htm
 
 ## Discussion credit
 
+### Arcana coordinated staged workflow
+
+[Experimental workflow](https://github.com/dayowe/arcana-codex-plugins/tree/e7701818173ccf00db5d2f1c2cb149b4822f7f14)
+
+- **Premise:** Separate planning, implementation and review into explicit stages with bounded handoffs.
+- **Takeaway:** Give implementation one owner, return correction deltas and carry settled decisions between stages. Fresh contexts can help when earlier history is irrelevant. Do not turn these ideas into a mandatory chain of specialists; its reported before/after token reduction is not a matched accepted-result cost comparison.
+
+### Parallel versus sequential agent systems
+
 [u/PilgrimofHaqq2: Parallel vs Sequential Agent Systems](https://www.reddit.com/r/claude/comments/1w7k9au/parallel_vs_sequential_agent_systems_research/)
 
 - **Premise:** Collect research and engineering arguments about parallel and sequential agent workflows.
 - **Takeaway:** A useful reading list; verify quantitative claims and broad rules against the primary sources above. Dependency structure is a better dispatch criterion than a blanket read/write distinction.
 
-The [README credits](../README.md#credits) retain the project's earlier model-routing and polling references. The [combined GPT/Claude comparison](model-performance-comparison.md) links the source workbooks and records interpretation limits.
-
 ## Model selection and runtime
 
 ### Model and effort guidance
 
-[OpenAI current-model guide](https://developers.openai.com/api/docs/guides/latest-model) · [Anthropic Fable 5.1 overview](https://platform.claude.com/docs/en/models/fable-5-1/overview) · [Fable prompting guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1) · [Claude effort controls](https://platform.claude.com/docs/en/build-with-claude/effort)
+[GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol) · [Claude Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview) · [Claude Code model configuration](https://code.claude.com/docs/en/model-config)
 
 - **Premise:** Describe intended workloads, prompting and configurable reasoning effort.
 - **Takeaway:** Choose effort for the task and verify runtime support. Equal labels across families do not imply equal reasoning. Vendor descriptions inform candidates, not mandatory specialist roles.

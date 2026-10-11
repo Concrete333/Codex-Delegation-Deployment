@@ -22,7 +22,7 @@ class HostTests(unittest.TestCase):
         self.state = self.root / "private-state"
         self.bridge = self.cwd / ".bridge"
         (self.cwd / "contract.txt").write_text("fixed contract\n")
-        self.job = {"id": "approved-1", "provider": "codex", "model": "gpt-5.6-luna", "effort": "max",
+        self.job = {"id": "approved-1", "provider": "codex", "model": "gpt-6.1-sol", "effort": "medium",
                     "cwd": str(self.cwd), "prompt": "Read contract.txt and return a concise summary.",
                     "profile": "review", "trusted_context": True, "timeout_seconds": 5,
                     "protected_files": ["contract.txt"], "artifacts": [], "checks": []}
@@ -46,7 +46,8 @@ class HostTests(unittest.TestCase):
         original = copy.deepcopy(self.job)
         def ready(packet):
             self.job["prompt"] = "unapproved instruction"
-            self.job["model"] = "gpt-6-astra"
+            self.job["model"] = "unapproved-model"
+            self.job["effort"] = "high"
             self.trigger(packet)
         result, dispatch, _ = self.serve(ready)
         self.assertEqual(result["status"], "ready_for_review")
@@ -54,7 +55,8 @@ class HostTests(unittest.TestCase):
         dispatch.assert_called_once()
         job = dispatch.call_args.args[0]
         self.assertEqual(job["prompt"], original["prompt"])
-        self.assertEqual(job["model"], "gpt-5.6-luna")
+        self.assertEqual(job["model"], "gpt-6.1-sol")
+        self.assertEqual(job["effort"], original["effort"])
 
     def test_extra_trigger_fields_cannot_supply_host_commands(self):
         result, dispatch, _ = self.serve(lambda packet: self.trigger(packet, lambda data: data.update(argv=["unapproved.exe"])))
@@ -108,7 +110,7 @@ class HostTests(unittest.TestCase):
                 self.serve()
 
     def test_no_claude_bridge_without_separate_qualification(self):
-        self.job.update(provider="claude", model="claude-opus-5", effort="low")
+        self.job.update(provider="claude", model="claude-opus-5-5", effort="medium")
         with self.assertRaisesRegex(ValueError, "Codex workers only"):
             self.serve()
 

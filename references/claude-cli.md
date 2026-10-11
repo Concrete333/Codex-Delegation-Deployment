@@ -1,6 +1,6 @@
 # Claude CLI workers
 
-This wrapper supports Opus 5 when Claude delegation and its subscription use are authorized. Use the assigned effort; consult [model-selection.md](model-selection.md) only if selection is unresolved.
+Use this wrapper when Claude delegation and its subscription use are authorized. Supply an explicit model ID supported by the installed CLI and account, such as `claude-opus-5-5` for [Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview), and the assigned effort. Consult [model-selection.md](model-selection.md) only if selection is unresolved.
 
 ## Before dispatch
 
@@ -27,8 +27,8 @@ Request example for an independently justified review:
   "max_concurrent": 1,
   "jobs": [{
     "id": "correctness-review",
-    "model": "claude-opus-5",
-    "effort": "high",
+    "model": "claude-opus-5-5",
+    "effort": "medium",
     "profile": "review",
     "cwd": "C:/path/to/project",
     "trusted_context": true,
@@ -38,7 +38,7 @@ Request example for an independently justified review:
 }
 ```
 
-Profiles: `review`, `explore`, `edit`. Efforts: `low`, `medium`, `high`, `xhigh`, `max`; the installed CLI and account must support the requested setting. The wrapper accepts only `claude-opus-5` or a dated `claude-opus-5-YYYYMMDD` snapshot, not broad aliases. Optional fields: `session_id`, `allow_shell` (edit only), `max_budget_usd` (positive API-cost estimate cap, not an allowance meter). Model and effort must be explicit. A rejected configuration is a blocker, not permission to substitute.
+Profiles: `review`, `explore`, `edit`. The wrapper accepts CLI effort values `low`, `medium`, `high`, `xhigh`, `max`; support for a particular model still depends on the installed CLI and account. It forwards the requested model without a model allowlist; validation and dry-run do not establish model availability. Optional fields: `session_id`, `allow_shell` (edit only), `max_budget_usd` (positive API-cost estimate cap, not an allowance meter). Model and effort must be explicit. A rejected configuration is a blocker, not permission to substitute.
 
 Add jobs and explicitly raise `max_concurrent` (1–4) for independent work. Concurrent jobs involving edits require non-overlapping checkouts; separately ensure no shared mutable resources or unsettled interfaces. Do not concurrently resume the same session. A batch limit is local to that invocation, not machine-wide. Do not launch overlapping batches to bypass it. Sequential jobs do not automatically receive previous results; inspect and prepare a continuation when it depends on earlier work.
 

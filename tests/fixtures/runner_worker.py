@@ -30,7 +30,7 @@ if mode == "outside_artifact":
 if provider == "claude":
     data = {"subtype": "success", "is_error": False, "session_id": "claude-fixture-session",
             "structured_output": handoff, "usage": {"input_tokens": 100, "output_tokens": 20},
-            "modelUsage": {"claude-opus-5": {"inputTokens": 100}}, "total_cost_usd": 0.01}
+            "modelUsage": {"claude-opus-5-5": {"inputTokens": 100}}, "total_cost_usd": 0.01}
     if mode == "limit":
         data.update(subtype="error_max_budget_usd", is_error=True)
     elif mode == "denied":

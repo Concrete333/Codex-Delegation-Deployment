@@ -28,19 +28,15 @@ Timeouts and interruptions preserve logs and retain ownership for explicit recov
 
 Prompts go through stdin. Full evidence is saved once; terminal output contains paths and small factual summaries. Requested settings and reported telemetry remain distinct. Codex usage does not consistently expose effective effort or a dollar cost, so these are not invented. Claude costs are client-side API-equivalent estimates, not a subscription allowance meter. Account-side overflow and worker/command activity outside the declared contract are not bounded by an allowance cap here.
 
-## Qualification on 2026-09-11
+## Offline verification
 
-The offline suite launches deterministic Python fixtures, **not model CLIs**, through the real subprocess/log/check lifecycle. It covers success, partial/blocker reports, malformed output, CLI failure, missing/multiple completion events, permission denials, cost-limit returns, timeouts, preserved partial logs, claim retention, duplicate requests, changed request IDs, protected-checker changes, artifact changes during checks, compact output with full evidence retention, authentication guards and model/effort restrictions. Existing Claude wrapper regression tests run alongside it.
+The offline suite launches deterministic Python fixtures through the real subprocess/log/check lifecycle. It covers success, partial/blocker reports, malformed output, CLI failure, missing/multiple completion events, permission denials, cost-limit returns, timeouts, preserved partial logs, claim retention, duplicate requests, changed request IDs, protected-checker changes, artifact changes during checks, compact output with full evidence retention, authentication guards, explicit configuration forwarding and invalid input. Existing Claude wrapper regression tests run alongside it.
 
 ```powershell
 python -B -X utf8 -m unittest discover -s tests -q
 ```
 
-All 57 offline tests passed on Windows with Python 3.13. Read-only version/authentication checks passed for Codex 0.153.4 and Claude 2.1.266. Both CLIs accepted the generated argument lists with `--help`, without dispatching a worker. Help parsing does not validate every runtime configuration value. This is not an end-to-end paid-worker qualification: host wakeups, real provider output, native sandbox behavior and cost through acceptance still require a controlled live test.
-
-The [subsequent paired-test preflight](benchmarks/runner-preflight-2026-09-11.md) found a launch-context blocker: host-side Codex reports a ChatGPT login, but the same executable reports no login inside the coordinator's Windows sandbox. No paid participant runs were started. A sandboxed coordinator needs a qualified host-side launch mechanism before this nested-CLI comparison can proceed.
-
-The [host-bridge smoke test](benchmarks/host-bridge-smoke/results-2026-09-11.md) subsequently passed with one Luna Max worker. The host authorizes a frozen request; a sandbox client updates a host-owned trigger slot and reads a private receipt. No credentials are copied into the sandbox. The bridge is one-shot, Codex-only and intended for trusted cooperative coordinators, not malicious concurrent checkout writers. Checkpoint hashes are not snapshot isolation. This qualifies the launch boundary, not a cost saving.
+These checks make no model calls and do not establish account/model availability or end-to-end paid-worker behavior. Help parsing does not validate every runtime configuration value. Host wakeups, real provider output, native sandbox behavior and cost through acceptance require a controlled live test.
 
 ## Next comparison
 
@@ -52,7 +48,3 @@ Use the same frozen task, starting files, worker model/effort, assignment and ha
 Count all coordinator/worker tokens, cache categories, check/review work, repairs and failure costs through acceptance. Score consequential misses and false alarms against held-out cases; do not let fewer checks manufacture savings. Repeat the pair before claiming an advantage. Do not change routing, shorten policy, substitute a reviewer or add retries in the same comparison.
 
 The tool itself does not yet establish savings. Native event waits already avoid one polling failure mode, and a separate CLI worker can add context/startup overhead. Its hypothesis is narrower: software can remove predictable coordinator work without lowering the acceptance standard.
-
-The [first controlled attempt](benchmarks/runner-comparison/results-2026-09-11.md) passed the native arm but failed the software arm before worker launch: its copied temporary client script was unreadable from the sandbox. The canonical repo script remained executable in a no-model probe. This incomplete pair establishes no saving; the next preflight must qualify the exact client path, not just host authentication and private-state integrity.
-
-The [authorized recovery](benchmarks/runner-comparison/results-recovery-2026-09-11.md) repaired the path and a client ancestor-inspection issue. It passed all 244 cases but cost $2.19935520 versus the saved native arm's $1.16000836. The outer shell/tool wait still resumed Astra repeatedly: 41 coordinator responses during worker execution versus one native response. The Python-level wait therefore did not achieve the cost objective in this host. Keep the route experimental and prefer the native event-driven completion path.

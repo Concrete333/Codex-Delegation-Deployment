@@ -27,8 +27,7 @@ SCHEMA = {
     "required": ["status", "summary", "artifacts", "checks", "risks"],
 }
 ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}\Z")
-EFFORTS = {"low", "medium", "high", "xhigh", "max"}
-MODELS = {"gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"}
+EFFORTS = {"low", "medium", "high", "xhigh", "max", "ultra"}
 
 
 def read_json(path):
@@ -95,8 +94,8 @@ def validate(raw):
     if job["effort"] not in EFFORTS or job["profile"] not in {"review", "explore", "edit"}:
         raise ValueError("Unsupported effort or profile")
     if job["provider"] == "codex":
-        if job["model"] not in MODELS or (job["model"] == "gpt-5.6-luna" and job["effort"] != "max"):
-            raise ValueError("Codex workers: Luna Max, Terra or Sol only")
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]*", job["model"]):
+            raise ValueError("model must be an explicit identifier without spaces or leading '-'")
         if "allow_shell" in job or "max_budget_usd" in job:
             raise ValueError("allow_shell and max_budget_usd are Claude-only fields")
     elif job["provider"] == "claude":

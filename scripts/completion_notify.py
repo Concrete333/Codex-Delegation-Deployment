@@ -56,13 +56,15 @@ def notify(binary, thread, receipt):
         state = json.loads(receipt.read_text(encoding="utf-8-sig"))
         heading = ("Background attempt needs intervention; worker termination or ownership is unresolved."
                    if state.get("ownership_check_required") or state.get("termination_unconfirmed")
-                   else "Background supervisor reported a result.")
-        message = (heading + " Inspect the saved receipt at " + str(receipt)
-                   + ". Verify completion and ownership before dependent work. "
-                   "A failed or partial attempt is not accepted. Continue only the authorized task; "
-                   "after confirmed termination and a verified mechanical fix, a safe rerun within "
-                   "existing scope and budget needs no renewed permission. Preserve failure evidence; "
-                   "do not duplicate side effects or retry uncertain ownership or delivery.")
+                   else f"Background result for {receipt.parent.name} "
+                        f"(status: {state.get('status', 'unknown')}, "
+                        f"exit code: {state.get('exit_code', 'unknown')}).")
+        message = (heading + " Receipt: " + str(receipt)
+                   + ". If this receipt was already handled, ignore this delayed event silently; "
+                   "do not repeat checks, acknowledge it or resume a finished task. Otherwise honor "
+                   "newer user instructions, inspect saved evidence and verify outcome and ownership "
+                   "before continuing the authorized task. Process exit is not acceptance. Preserve "
+                   "failure evidence; do not duplicate side effects or retry uncertain ownership or delivery.")
         completed = subprocess.run([binary, "queue", "--thread", thread, "--message", message],
                                    capture_output=True, text=True, timeout=30)
         result.update(status="queued" if completed.returncode == 0 else "failed",
